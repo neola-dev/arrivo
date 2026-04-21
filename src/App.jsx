@@ -170,7 +170,7 @@ function App() {
     <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY} libraries={libraries}>
       <div className="app-container">
 
-        <h1 className="app-title">JourneyAlert</h1>
+        <h1 className="app-title">Arrivo</h1>
 
         <p className="app-subtitle">
           💤 Never miss your stop again. Arrivo tracks your journey in real-time and wakes you up before your destination — even if you fall asleep.
