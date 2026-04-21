@@ -16,6 +16,11 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [userLat, setUserLat] = useState(null);
   const [userLng, setUserLng] = useState(null);
+  const [locationError, setLocationError] = useState(false);
+
+  // ✅ NEW
+  const [isDesktop, setIsDesktop] = useState(false);
+  const [selectingSource, setSelectingSource] = useState(false);
 
   const [distance, setDistance] = useState(null);
   const [eta, setEta] = useState(null);
@@ -34,7 +39,6 @@ function App() {
 
   const [travelMode, setTravelMode] = useState("car");
 
-  // 🔥 NEW STATES
   const [prevDistance, setPrevDistance] = useState(null);
   const [isMovingTowards, setIsMovingTowards] = useState(false);
   const [hasStartedMoving, setHasStartedMoving] = useState(false);
@@ -50,6 +54,12 @@ function App() {
   const [journeyStarted, setJourneyStarted] = useState(false);
   const [audio] = useState(new Audio("/alert.mp3"));
 
+  // ✅ Detect device
+  useEffect(() => {
+    const isMobile = /Mobi|Android|iPhone/i.test(navigator.userAgent);
+    setIsDesktop(!isMobile);
+  }, []);
+
   const resetJourney = () => {
     setJourneyStarted(false);
     setAlertTriggered(false);
@@ -59,7 +69,6 @@ function App() {
     setRemainingTime(null);
     setTestMode(false);
 
-    // reset movement logic
     setPrevDistance(null);
     setIsMovingTowards(false);
     setHasStartedMoving(false);
@@ -68,11 +77,12 @@ function App() {
     audio.currentTime = 0;
   };
 
-  
-
-  // 📍 Location tracking (FIXED LOGIC)
+  // 📍 LOCATION TRACKING
   useEffect(() => {
-    if (!navigator.geolocation) return;
+    if (!navigator.geolocation) {
+      setLocationError(true);
+      return;
+    }
 
     const watcher = navigator.geolocation.watchPosition(
       (position) => {
@@ -81,6 +91,7 @@ function App() {
 
         setUserLat(lat);
         setUserLng(lng);
+        setLocationError(false);
 
         if (!destLat || !destLng) return;
 
@@ -89,12 +100,11 @@ function App() {
 
         const speed = speedMap[travelMode] || 40;
         const timeMin = (d / speed) * 60;
-        const totalTripTime = (d / (speedMap[travelMode] || 40)) * 60;
-        const isShortJourney = totalTripTime <= 15;
+        const isShortJourney = timeMin <= 15;
+
         setEta(timeMin.toFixed(1));
         setRemainingTime(timeMin);
 
-        // 🔥 MOVEMENT DETECTION
         if (prevDistance !== null) {
           if (d < prevDistance) {
             setIsMovingTowards(true);
@@ -106,26 +116,22 @@ function App() {
 
         setPrevDistance(d);
 
-       if (!journeyStarted || !destLat || !destLng) return;
-        
-       const allowAlert = testMode || (hasStartedMoving && isMovingTowards);
+        if (!journeyStarted || !destLat || !destLng) return;
 
-        // WARNING
-          if (allowAlert && timeMin <= alertTime * 2 && alertStage === null) {
-            setAlertStage("warning");
-            setShowAlert(true);
-            setAlertMessage("🟡 You are getting close to your destination");
-          }
+        const allowAlert = testMode || (hasStartedMoving && isMovingTowards);
 
-        // 🔴 FINAL ALERT
+        if (allowAlert && timeMin <= alertTime * 2 && alertStage === null) {
+          setAlertStage("warning");
+          setShowAlert(true);
+          setAlertMessage("🟡 You are getting close to your destination");
+        }
+
         if (allowAlert && timeMin <= alertTime && !alertTriggered) {
 
-          // 🚨 SHORT JOURNEY CASE
           if (isShortJourney) {
             setAlertStage("final");
             setShowAlert(true);
-
-            setAlertMessage("⚠️ Short journey detected — You will reach soon, so alert is triggered immediately");
+            setAlertMessage("⚠️ Short journey detected — alert triggered immediately");
 
             audio.play().catch(() => {});
             navigator.vibrate?.([500, 300, 500]);
@@ -134,10 +140,8 @@ function App() {
             return;
           }
 
-          // NORMAL CASE
           setAlertStage("final");
           setShowAlert(true);
-
           setAlertMessage("🔴 Final alert: You are about to reach your destination");
 
           audio.play().catch(() => {});
@@ -146,7 +150,9 @@ function App() {
           setAlertTriggered(true);
         }
       },
-      (err) => console.error(err),
+      () => {
+        setLocationError(true);
+      },
       { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
     );
 
@@ -170,11 +176,36 @@ function App() {
     <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY} libraries={libraries}>
       <div className="app-container">
 
-        <h1 className="app-title">Arrivo</h1>
+        <h1 className="app-title">ARRIVO</h1>
 
         <p className="app-subtitle">
-          💤 Never miss your stop again. Arrivo tracks your journey in real-time and wakes you up before your destination — even if you fall asleep.
+          💤 Never miss your stop again. Arrivo tracks your journey in real-time and wakes you up before your destination.
         </p>
+
+        {/* ✅ SMART MESSAGE */}
+        {locationError && (
+          <div className="error-box">
+            📍 Location not detected. 
+            {isDesktop && (
+              <>
+                <br />
+                👉 Click on map to select your <strong>starting point</strong>.
+                <br />
+                💡 For best experience, use mobile.
+              </>
+            )}
+          </div>
+        )}
+
+        {/* ✅ BUTTON FOR MANUAL SOURCE */}
+        {locationError && isDesktop && !userLat && (
+          <button
+            className="manual-src-btn"
+            onClick={() => setSelectingSource(true)}
+          >
+            Select Source on Map
+          </button>
+        )}
 
         {/* MAP */}
         <div className="section map-section">
@@ -188,10 +219,13 @@ function App() {
             setPlaceName={setPlaceName}
             setTestMode={setTestMode}
             journeyStarted={journeyStarted}
+            setUserLat={setUserLat}
+            setUserLng={setUserLng}
+            selectingSource={selectingSource}   // ✅ NEW
+            setSelectingSource={setSelectingSource}
           />
         </div>
 
-        {/* SOURCE + DEST */}
         <div className="section center">
           <LocationInfo
             userLat={userLat}
@@ -212,7 +246,6 @@ function App() {
           </div>
         )}
 
-        {/* CONTROLS */}
         <div className="control-panel">
 
           {!journeyStarted && (
@@ -260,30 +293,6 @@ function App() {
                   resetJourney={resetJourney}
                   audio={audio}
                 />
-
-                <button
-                  className="test-btn"
-                  onClick={async() => {
-                    if (!userLat || !userLng) {
-                      alert("Location not available!");
-                      return;
-                    }
-                    try {
-                      await audio.play();   // 🔥 unlock
-                      audio.pause();
-                      audio.currentTime = 0;
-                    } catch {}
-
-                    setDestLat(userLat);
-                    setDestLng(userLng);
-                    setPlaceName("📍 Test Mode");
-                    setAlertTime(0.5);
-                    setTestMode(true);
-                    setJourneyStarted(true);
-                  }}
-                >
-                  Test Mode
-                </button>
               </div>
             </>
           )}
@@ -300,11 +309,8 @@ function App() {
           )}
         </div>
 
-        {/* STATS */}
         <div className="section center">
           <p><strong>Destination:</strong> {placeName || "Not selected"}</p>
-
-          {testMode && <div className="test-banner">🧪 Test Mode Active</div>}
 
           {journeyStarted && (
             <div className="stats-container">

@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { MapContainer, TileLayer, Marker, useMap ,useMapEvents} from "react-leaflet";
+import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from "react-leaflet";
 import L from "leaflet";
 import "leaflet-routing-machine";
 import "leaflet-routing-machine/dist/leaflet-routing-machine.css";
@@ -52,15 +52,36 @@ function MapSelector({
   setPlaceName,
   setTestMode,
   journeyStarted,
+
+  // ✅ NEW PROPS
+  selectingSource,
+  setSelectingSource,
+  setUserLat,
+  setUserLng,
 }) {
+
   function LocationSelector() {
     useMapEvents({
       click(e) {
         if (journeyStarted) return;
 
-        setDestLat(e.latlng.lat);
-        setDestLng(e.latlng.lng);
-        setPlaceName("Selected from Map");
+        const lat = e.latlng.lat;
+        const lng = e.latlng.lng;
+
+        // 🔥 SOURCE SELECTION MODE (for laptop fallback)
+        if (selectingSource) {
+          setUserLat(lat);
+          setUserLng(lng);
+          setSelectingSource(false);
+
+          setPlaceName("📍 Source selected manually");
+          return;
+        }
+
+        // 🎯 NORMAL DESTINATION SELECTION
+        setDestLat(lat);
+        setDestLng(lng);
+        setPlaceName("📍 Destination selected from map");
         setTestMode(false);
       },
     });
@@ -79,10 +100,10 @@ function MapSelector({
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
 
-      {/* User marker */}
+      {/* 🟢 USER / SOURCE MARKER */}
       {userLat && userLng && <Marker position={[userLat, userLng]} />}
 
-      {/* Destination marker */}
+      {/* 🔴 DESTINATION MARKER */}
       {destLat && destLng && <Marker position={[destLat, destLng]} />}
 
       {/* ROUTE LINE */}
