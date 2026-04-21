@@ -4,7 +4,7 @@ import { getDistance } from "./utils/distance";
 import "./App.css";
 
 import LocationInfo from "./components/LocationInfo";
-import JourneyControls from "./components/journeyControls";
+import JourneyControls from "./components/JourneyControls";
 import AlertBox from "./components/AlertBox";
 import MapSelector from "./components/MapSelector";
 import SearchDestination from "./components/SearchDestination";
