@@ -182,20 +182,19 @@ function App() {
           💤 Never miss your stop again. Arrivo tracks your journey in real-time and wakes you up before your destination.
         </p>
 
-        {/* ✅ SMART MESSAGE */}
-        {locationError && (
-          <div className="error-box">
-            📍 Location not detected. 
-            {isDesktop && (
-              <>
-                <br />
-                👉 Click on map to select your <strong>starting point</strong>.
-                <br />
-                💡 For best experience, use mobile.
-              </>
-            )}
-          </div>
-        )}
+        <div className="error-box">
+          📍 <strong>Location not detected.</strong><br />
+          If you're on laptop, click below and select your source manually.<br />
+          📱 For best experience, use mobile.
+
+          <br />
+          <button
+            className="manual-src-btn"
+            onClick={() => setSelectingSource(true)}
+          >
+            Select Source on Map
+          </button>
+        </div>
 
         {/* ✅ BUTTON FOR MANUAL SOURCE */}
         {locationError && isDesktop && !userLat && (
