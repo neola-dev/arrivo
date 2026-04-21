@@ -222,17 +222,69 @@ function App() {
             />
           </div>
         )}
-
         <div className="control-panel">
-          <JourneyControls
-            journeyStarted={journeyStarted}
-            setJourneyStarted={setJourneyStarted}
-            destLat={destLat}
-            destLng={destLng}
-            resetJourney={resetJourney}
-            audio={audio}
-          />
+
+          {!journeyStarted && (
+            <>
+              <div className="control-block">
+                <p className="control-title">Mode: {travelMode}</p>
+                <div className="toggle-group">
+                  {["walking", "bike", "car", "bus", "train"].map((mode) => (
+                    <button
+                      key={mode}
+                      className={`toggle-btn ${travelMode === mode ? "active" : ""}`}
+                      onClick={() => setTravelMode(mode)}
+                    >
+                      {mode === "walking" && "🚶"}
+                      {mode === "bike" && "🛵"}
+                      {mode === "car" && "🚗"}
+                      {mode === "bus" && "🚌"}
+                      {mode === "train" && "🚆"}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="control-block">
+                <p className="control-title">Alert: {alertTime} mins</p>
+                <div className="toggle-group">
+                  {[5, 10, 15].map((time) => (
+                    <button
+                      key={time}
+                      className={`toggle-btn ${alertTime === time ? "active" : ""}`}
+                      onClick={() => setAlertTime(time)}
+                    >
+                      {time}m
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="controls-row">
+                <JourneyControls
+                  journeyStarted={journeyStarted}
+                  setJourneyStarted={setJourneyStarted}
+                  destLat={destLat}
+                  destLng={destLng}
+                  resetJourney={resetJourney}
+                  audio={audio}
+                />
+              </div>
+            </>
+          )}
+
+          {journeyStarted && (
+            <JourneyControls
+              journeyStarted={journeyStarted}
+              setJourneyStarted={setJourneyStarted}
+              destLat={destLat}
+              destLng={destLng}
+              resetJourney={resetJourney}
+              audio={audio}
+            />
+          )}
         </div>
+        
 
         <div className="section center">
           <p><strong>Destination:</strong> {placeName || "Not selected"}</p>
