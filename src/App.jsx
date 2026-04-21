@@ -18,7 +18,6 @@ function App() {
   const [userLng, setUserLng] = useState(null);
   const [locationError, setLocationError] = useState(false);
 
-  // ✅ NEW
   const [isDesktop, setIsDesktop] = useState(false);
   const [selectingSource, setSelectingSource] = useState(false);
 
@@ -77,7 +76,7 @@ function App() {
     audio.currentTime = 0;
   };
 
-  // 📍 LOCATION TRACKING
+  // 📍 GEOLOCATION TRACKING
   useEffect(() => {
     if (!navigator.geolocation) {
       setLocationError(true);
@@ -96,79 +95,65 @@ function App() {
         if (!destLat || !destLng) return;
 
         const d = getDistance(lat, lng, destLat, destLng);
-        setDistance(d.toFixed(2));
-
-        const speed = speedMap[travelMode] || 40;
-        const timeMin = (d / speed) * 60;
-        const isShortJourney = timeMin <= 15;
-
-        setEta(timeMin.toFixed(1));
-        setRemainingTime(timeMin);
-
-        if (prevDistance !== null) {
-          if (d < prevDistance) {
-            setIsMovingTowards(true);
-            setHasStartedMoving(true);
-          } else {
-            setIsMovingTowards(false);
-          }
-        }
-
-        setPrevDistance(d);
-
-        if (!journeyStarted || !destLat || !destLng) return;
-
-        const allowAlert = testMode || (hasStartedMoving && isMovingTowards);
-
-        if (allowAlert && timeMin <= alertTime * 2 && alertStage === null) {
-          setAlertStage("warning");
-          setShowAlert(true);
-          setAlertMessage("🟡 You are getting close to your destination");
-        }
-
-        if (allowAlert && timeMin <= alertTime && !alertTriggered) {
-
-          if (isShortJourney) {
-            setAlertStage("final");
-            setShowAlert(true);
-            setAlertMessage("⚠️ Short journey detected — alert triggered immediately");
-
-            audio.play().catch(() => {});
-            navigator.vibrate?.([500, 300, 500]);
-
-            setAlertTriggered(true);
-            return;
-          }
-
-          setAlertStage("final");
-          setShowAlert(true);
-          setAlertMessage("🔴 Final alert: You are about to reach your destination");
-
-          audio.play().catch(() => {});
-          navigator.vibrate?.([500, 300, 500]);
-
-          setAlertTriggered(true);
-        }
+        handleDistanceLogic(d);
       },
-      () => {
-        setLocationError(true);
-      },
-      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+      () => setLocationError(true),
+      { enableHighAccuracy: true }
     );
 
     return () => navigator.geolocation.clearWatch(watcher);
-  }, [
-    destLat,
-    destLng,
-    travelMode,
-    alertTime,
-    alertTriggered,
-    journeyStarted,
-    alertStage,
-    prevDistance,
-    isMovingTowards,
-    hasStartedMoving,
-  ]);
+  }, [destLat, destLng, travelMode]);
+
+  // ✅ FIX: manual selection calculation
+  useEffect(() => {
+    if (!userLat || !userLng || !destLat || !destLng) return;
+
+    const d = getDistance(userLat, userLng, destLat, destLng);
+    handleDistanceLogic(d);
+  }, [userLat, userLng, destLat, destLng]);
+
+  // 🔥 COMMON DISTANCE LOGIC
+  const handleDistanceLogic = (d) => {
+    setDistance(d.toFixed(2));
+
+    const speed = speedMap[travelMode] || 40;
+    const timeMin = (d / speed) * 60;
+
+    setEta(timeMin.toFixed(1));
+    setRemainingTime(timeMin);
+
+    if (prevDistance !== null) {
+      if (d < prevDistance) {
+        setIsMovingTowards(true);
+        setHasStartedMoving(true);
+      } else {
+        setIsMovingTowards(false);
+      }
+    }
+
+    setPrevDistance(d);
+
+    if (!journeyStarted) return;
+
+    const allowAlert = testMode || (hasStartedMoving && isMovingTowards);
+
+    if (allowAlert && timeMin <= alertTime * 2 && alertStage === null) {
+      setAlertStage("warning");
+      setShowAlert(true);
+      setAlertMessage("🟡 You are getting close to your destination");
+    }
+
+    if (allowAlert && timeMin <= alertTime && !alertTriggered) {
+      setAlertStage("final");
+      setShowAlert(true);
+      setAlertMessage("🔴 Final alert: You are about to reach your destination");
+
+      audio.play().catch(() => {});
+      navigator.vibrate?.([500, 300, 500]);
+
+      setAlertTriggered(true);
+    }
+  };
 
   return loading ? (
     <SplashScreen onFinish={() => setLoading(false)} />
@@ -179,23 +164,25 @@ function App() {
         <h1 className="app-title">ARRIVO</h1>
 
         <p className="app-subtitle">
-          💤 Never miss your stop again. Arrivo tracks your journey in real-time and wakes you up before your destination.
+          💤 Never miss your stop again. Smart wake-up alerts for travelers.
         </p>
 
-        <div className="error-box">
-          📍 <strong>Location not detected.</strong><br />
-          If you're on laptop, click below and select your source manually.<br />
-          📱 For best experience, use mobile.
+        {/* ✅ FIXED ERROR BOX */}
+        {isDesktop && locationError && (
+          <div className="error-box">
+            📍 <strong>Location not detected.</strong><br />
+            Click below to select your source manually.<br />
+            📱 For best experience, use mobile.
 
-          <br />
-          <button
-            className="manual-src-btn"
-            onClick={() => setSelectingSource(true)}
-          >
-            Select Source on Map
-          </button>
-        </div>
-
+            <br />
+            <button
+              className="manual-src-btn"
+              onClick={() => setSelectingSource(true)}
+            >
+              Select Source on Map
+            </button>
+          </div>
+        )}
 
         {/* MAP */}
         <div className="section map-section">
@@ -211,7 +198,7 @@ function App() {
             journeyStarted={journeyStarted}
             setUserLat={setUserLat}
             setUserLng={setUserLng}
-            selectingSource={selectingSource}   // ✅ NEW
+            selectingSource={selectingSource}
             setSelectingSource={setSelectingSource}
           />
         </div>
@@ -237,66 +224,14 @@ function App() {
         )}
 
         <div className="control-panel">
-
-          {!journeyStarted && (
-            <>
-              <div className="control-block">
-                <p className="control-title">Mode: {travelMode}</p>
-                <div className="toggle-group">
-                  {["walking", "bike", "car", "bus", "train"].map((mode) => (
-                    <button
-                      key={mode}
-                      className={`toggle-btn ${travelMode === mode ? "active" : ""}`}
-                      onClick={() => setTravelMode(mode)}
-                    >
-                      {mode === "walking" && "🚶"}
-                      {mode === "bike" && "🛵"}
-                      {mode === "car" && "🚗"}
-                      {mode === "bus" && "🚌"}
-                      {mode === "train" && "🚆"}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="control-block">
-                <p className="control-title">Alert: {alertTime} mins</p>
-                <div className="toggle-group">
-                  {[5, 10, 15].map((time) => (
-                    <button
-                      key={time}
-                      className={`toggle-btn ${alertTime === time ? "active" : ""}`}
-                      onClick={() => setAlertTime(time)}
-                    >
-                      {time}m
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="controls-row">
-                <JourneyControls
-                  journeyStarted={journeyStarted}
-                  setJourneyStarted={setJourneyStarted}
-                  destLat={destLat}
-                  destLng={destLng}
-                  resetJourney={resetJourney}
-                  audio={audio}
-                />
-              </div>
-            </>
-          )}
-
-          {journeyStarted && (
-            <JourneyControls
-              journeyStarted={journeyStarted}
-              setJourneyStarted={setJourneyStarted}
-              destLat={destLat}
-              destLng={destLng}
-              resetJourney={resetJourney}
-              audio={audio}
-            />
-          )}
+          <JourneyControls
+            journeyStarted={journeyStarted}
+            setJourneyStarted={setJourneyStarted}
+            destLat={destLat}
+            destLng={destLng}
+            resetJourney={resetJourney}
+            audio={audio}
+          />
         </div>
 
         <div className="section center">
