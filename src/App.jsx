@@ -269,6 +269,30 @@ function App() {
                   resetJourney={resetJourney}
                   audio={audio}
                 />
+
+                <button
+                  className="test-btn"
+                  onClick={async() => {
+                    if (!userLat || !userLng) {
+                      alert("Location not available!");
+                      return;
+                    }
+                    try {
+                      await audio.play();   // 🔥 unlock
+                      audio.pause();
+                      audio.currentTime = 0;
+                    } catch {}
+
+                    setDestLat(userLat);
+                    setDestLng(userLng);
+                    setPlaceName("📍 Test Mode");
+                    setAlertTime(0.5);
+                    setTestMode(true);
+                    setJourneyStarted(true);
+                  }}
+                >
+                  Test Mode
+                </button>
               </div>
             </>
           )}
@@ -288,7 +312,7 @@ function App() {
 
         <div className="section center">
           <p><strong>Destination:</strong> {placeName || "Not selected"}</p>
-
+          {testMode && ( <> <div className="test-banner">🧪 Test Mode Active</div> <p>Source & destination are the same, so alerts trigger instantly.</p> </> )}
           {journeyStarted && (
             <div className="stats-container">
               <div className="stat-card">
