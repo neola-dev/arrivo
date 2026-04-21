@@ -359,9 +359,6 @@ button.active {
   }
 }
 
-/* ============================= */
-/* 🎯 EXTRA POLISH */
-/* ============================= */
 
 /* Make buttons wrap nicely on very small screens */
 @media (max-width: 400px) {
