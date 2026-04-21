@@ -1,0 +1,377 @@
+/* ===== GLOBAL RESET ===== */
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
+  font-family: "Poppins", sans-serif;
+  background: linear-gradient(135deg, #0f172a, #020617);
+  color: #e2e8f0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* ===== MAIN CONTAINER ===== */
+.app-container {
+  padding: 24px;
+  max-width: 1100px;
+  margin: auto;
+}
+
+/* ===== TITLE ===== */
+.app-title {
+  text-align: center;
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #38bdf8;
+  margin-bottom: 30px;
+}
+
+/* ===== SECTION ===== */
+.section {
+  background: rgba(30, 41, 59, 0.8);
+  backdrop-filter: blur(10px);
+  padding: 20px;
+  border-radius: 18px;
+  margin: 18px 0;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+}
+
+/* ===== MAP ===== */
+.map-container {
+  border-radius: 18px;
+  overflow: hidden;
+  border: 2px solid #334155;
+}
+
+/* ===== CONTROL PANEL (MAIN UI FIX) ===== */
+.control-panel {
+  margin-top: 30px;
+  padding: 28px;
+  border-radius: 20px;
+
+  background: rgba(30, 41, 59, 0.75);
+  backdrop-filter: blur(14px);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 25px;
+  text-align: center;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+}
+.app-subtitle {
+  text-align: center;
+  margin-top: -10px;
+  margin-bottom: 20px;
+  font-size: 15px;
+  color: #94a3b8;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.6;
+}
+
+/* ===== GROUP TITLES ===== */
+.control-title {
+  font-size: 14px;
+  color: white;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+/* ===== BUTTON BASE ===== */
+button {
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  border: none;
+  color: white;
+  padding: 10px 16px;
+  margin: 5px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.25s ease;
+}
+
+button:hover {
+  transform: scale(1.08);
+}
+
+/* ===== ACTIVE BUTTON ===== */
+button.active {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  box-shadow: 0 0 10px rgba(34,197,94,0.6);
+}
+
+/* ===== BUTTON GROUP ===== */
+.mode-row,
+.alert-row,
+.action-row {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* ===== TEST BUTTON ===== */
+.test-btn {
+  background: linear-gradient(135deg, #f59e0b, #f97316);
+}
+
+.test-btn:hover {
+  background: linear-gradient(135deg, #ea580c, #c2410c);
+}
+
+/* ===== START BUTTON (inside JourneyControls should use this class) ===== */
+.start-btn {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+}
+
+/* ===== SEARCH INPUT ===== */
+.control-panel input {
+  width: 300px;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  outline: none;
+}
+
+/* ===== TEST BANNER ===== */
+.test-banner {
+  margin-top: 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: rgba(255, 193, 7, 0.15);
+  border: 1px solid #facc15;
+  color: #facc15;
+  font-weight: 500;
+  text-align: center;
+}
+
+/* ===== CENTER TEXT ===== */
+.center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* ===== STATS GRID (IMPORTANT FIX) ===== */
+.stats-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 20px;
+  margin-top: 25px;
+  width: 100%;
+}
+
+/* ===== STAT CARD ===== */
+.stat-card {
+  position: relative;
+  padding: 22px;
+  border-radius: 18px;
+  background: rgba(30, 41, 59, 0.6);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255,255,255,0.08);
+  text-align: center;
+
+  box-shadow: 
+    0 10px 30px rgba(0,0,0,0.5),
+    inset 0 0 10px rgba(255,255,255,0.05);
+
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-8px) scale(1.03);
+}
+
+/* ===== LABEL ===== */
+.stat-label {
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #94a3b8;
+  margin-bottom: 8px;
+}
+
+/* ===== VALUE ===== */
+.stat-card h2 {
+  font-size: 30px;
+  font-weight: 700;
+  margin: 0;
+}
+
+/* ===== COLORS ===== */
+.stat-card:nth-child(1) {
+  border-left: 4px solid #f97316;
+}
+.stat-card:nth-child(1) h2 {
+  color: #fb923c;
+}
+
+.stat-card:nth-child(2) {
+  border-left: 4px solid #22c55e;
+}
+.stat-card:nth-child(2) h2 {
+  color: #4ade80;
+}
+
+.stat-card:nth-child(3) {
+  border-left: 4px solid #38bdf8;
+}
+.stat-card:nth-child(3) h2 {
+  color: #38bdf8;
+}
+
+/* ===== SPLASH ===== */
+.logo {
+  font-size: 56px;
+  font-weight: 800;
+  letter-spacing: 6px;
+  color: white;
+}
+
+.tagline {
+  margin-top: 12px;
+  font-size: 16px;
+  opacity: 0.75;
+}
+
+
+/* ===== ANIMATIONS ===== */
+@keyframes zoomIn {
+  from {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ============================= */
+/* 📱 MOBILE (max-width: 640px) */
+/* ============================= */
+@media (max-width: 640px) {
+
+  .app-container {
+    padding: 16px;
+  }
+
+  .app-title {
+    font-size: 26px;
+    letter-spacing: 1px;
+  }
+
+  .section {
+    padding: 14px;
+    border-radius: 14px;
+  }
+
+  /* Control panel tighter */
+  .control-panel {
+    padding: 18px;
+    gap: 18px;
+  }
+
+  /* Buttons smaller */
+  button {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  /* Stack buttons nicely */
+  .mode-row,
+  .alert-row,
+  .action-row {
+    gap: 8px;
+  }
+
+  /* Input full width */
+  .control-panel input {
+    width: 100%;
+  }
+
+  /* Stats become 1 column */
+  .stats-container {
+    grid-template-columns: 1fr;
+  }
+
+  .stat-card {
+    padding: 18px;
+  }
+
+  .stat-card h2 {
+    font-size: 24px;
+  }
+}
+
+/* ============================= */
+/* 📲 TABLET (641px - 1024px) */
+/* ============================= */
+@media (min-width: 641px) and (max-width: 1024px) {
+
+  .app-container {
+    padding: 20px;
+  }
+
+  .app-title {
+    font-size: 30px;
+  }
+
+  .section {
+    padding: 16px;
+  }
+
+  .control-panel {
+    padding: 22px;
+  }
+
+  /* Stats 2 columns */
+  .stats-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .stat-card h2 {
+    font-size: 26px;
+  }
+}
+
+/* ============================= */
+/* 💻 LARGE SCREEN (1025px+) */
+/* ============================= */
+@media (min-width: 1025px) {
+
+  .stats-container {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ============================= */
+/* 🎯 EXTRA POLISH */
+/* ============================= */
+
+/* Make buttons wrap nicely on very small screens */
+@media (max-width: 400px) {
+  button {
+    flex: 1 1 100%;
+  }
+}
+
+/* Prevent overflow issues */
+img, iframe, video {
+  max-width: 100%;
+  height: auto;
+}

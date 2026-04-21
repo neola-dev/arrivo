@@ -1,0 +1,76 @@
+/* MAIN CONTAINER */
+.location-container {
+  width: 100%;
+}
+
+/* CENTER DURING JOURNEY */
+.location-container.centered {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* SOURCE TEXT */
+.source-text {
+  margin-bottom: 12px;
+  font-size: 15px;
+  color: #cbd5f5;
+}
+
+/* 🔥 JOURNEY CARD BASE */
+.journey-box {
+  padding: 22px;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 420px;
+  color: white;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+/* ✨ STATUS VARIANTS */
+
+/* FAR → BLUE */
+.status-far {
+  background: linear-gradient(135deg, #2563eb, #1e3a8a);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+}
+
+/* MID → YELLOW */
+.status-mid {
+  background: linear-gradient(135deg, #f59e0b, #b45309);
+  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+}
+
+/* NEAR → RED */
+.status-near {
+  background: linear-gradient(135deg, #ef4444, #7f1d1d);
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+}
+
+/* HEADLINE */
+.journey-box h2 {
+  margin: 0;
+  font-size: 22px;
+  letter-spacing: 0.5px;
+}
+
+/* DISTANCE */
+.distance-text {
+  font-size: 20px;
+  margin-top: 12px;
+  font-weight: 600;
+}
+
+/* STATUS TEXT */
+.status-text {
+  margin-top: 8px;
+  font-size: 15px;
+  opacity: 0.9;
+}
+
+/* 🔥 HOVER EFFECT (nice touch) */
+.journey-box:hover {
+  transform: translateY(-3px) scale(1.02);
+}

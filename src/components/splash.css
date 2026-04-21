@@ -1,0 +1,140 @@
+body {
+  margin: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+  width: 100vw;
+  height: 100vh;
+}
+
+/* MAIN CONTAINER */
+.splash-container {
+  height: 100vh;
+  width: 100vw;
+  background: radial-gradient(circle at top, #1e3a8a, #020617);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  position: relative;
+  overflow: hidden;
+  animation: fadeIn 1s ease-in-out;
+}
+
+/* 🔥 GLOW BACKGROUND (more premium) */
+.bg-glow {
+  position: absolute;
+  width: 420px;
+  height: 420px;
+  background: radial-gradient(circle, rgba(59,130,246,0.5), transparent);
+  filter: blur(120px);
+  border-radius: 50%;
+  animation: floatGlow 6s infinite ease-in-out;
+}
+
+/* 🔥 SECOND LAYER GLOW (depth) */
+.bg-glow::after {
+  content: "";
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  background: rgba(147,197,253,0.3);
+  border-radius: 50%;
+  top: 80px;
+  left: 80px;
+  filter: blur(100px);
+}
+
+/* 🔥 PULSE RING (cleaner) */
+.pulse-ring {
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 50%;
+  animation: pulse 2.5s infinite;
+}
+
+/* 🔥 LOGO (strong impact) */
+.logo {
+  font-size: 58px;
+  font-weight: 800;
+  letter-spacing: 8px;
+  z-index: 2;
+  animation: zoomIn 1.2s ease;
+  text-shadow: 
+    0 0 25px rgba(59,130,246,0.9),
+    0 0 50px rgba(59,130,246,0.4);
+}
+
+/* 🔥 TAGLINE (main message) */
+.tagline {
+  margin-top: 14px;
+  font-size: 18px;
+  font-weight: 500;
+  opacity: 0.9;
+  letter-spacing: 1px;
+  animation: fadeUp 1.6s ease;
+}
+
+/* 🔥 SUBTITLE (USP) */
+.subtitle {
+  margin-top: 18px;
+  font-size: 14px;
+  opacity: 0.75;
+  animation: fadeUp 2s ease;
+}
+
+/* 🔥 SMALL SUPPORT TEXT */
+.subtitle.small {
+  margin-top: 6px;
+  font-size: 12px;
+  opacity: 0.6;
+}
+.lottie-wrapper {
+  width: 220px;
+  height: 220px;
+  z-index: 2;
+}
+
+/* 🔥 EXIT */
+.exit {
+  opacity: 0;
+  transform: scale(1.08);
+  filter: blur(6px);
+  transition: all 0.8s ease;
+}
+
+/* ✨ ANIMATIONS */
+
+/* smooth zoom */
+@keyframes zoomIn {
+  from { transform: scale(0.5); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* upward fade */
+@keyframes fadeUp {
+  from { transform: translateY(25px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* fade */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* smooth pulse */
+@keyframes pulse {
+  0% { transform: scale(0.9); opacity: 0.5; }
+  50% { transform: scale(1.25); opacity: 0.15; }
+  100% { transform: scale(0.9); opacity: 0.5; }
+}
+
+/* floating glow */
+@keyframes floatGlow {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-50px); }
+  100% { transform: translateY(0px); }
+}
