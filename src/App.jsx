@@ -167,7 +167,7 @@ function App() {
   return loading ? (
     <SplashScreen onFinish={() => setLoading(false)} />
   ) : (
-    <LoadScript googleMapsApiKey="AIzaSyDNIZmqaosz3-XpQF_m-8gUhrL82TIiWTI" libraries={libraries}>
+    <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY} libraries={libraries}>
       <div className="app-container">
 
         <h1 className="app-title">JourneyAlert</h1>
