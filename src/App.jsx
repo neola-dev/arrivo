@@ -196,15 +196,6 @@ function App() {
           </button>
         </div>
 
-        {/* ✅ BUTTON FOR MANUAL SOURCE */}
-        {locationError && isDesktop && !userLat && (
-          <button
-            className="manual-src-btn"
-            onClick={() => setSelectingSource(true)}
-          >
-            Select Source on Map
-          </button>
-        )}
 
         {/* MAP */}
         <div className="section map-section">
