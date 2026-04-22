@@ -273,7 +273,7 @@ function App() {
           </div>
         )}
 
-        {locationError && (
+        {locationError && !isDesktop && (
           <div className="error-box">
             📍 Location access is required for tracking.
 
