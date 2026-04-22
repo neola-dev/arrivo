@@ -9,7 +9,7 @@ import AlertBox from "./components/AlertBox";
 import MapSelector from "./components/MapSelector";
 import SearchDestination from "./components/SearchDestination";
 import SplashScreen from "./components/SplashScreen";
-
+import { useRef } from "react";
 const libraries = ["places"];
 
 function App() {
@@ -39,9 +39,10 @@ function App() {
   const [travelMode, setTravelMode] = useState("car");
 
   const [prevDistance, setPrevDistance] = useState(null);
+
   const [isMovingTowards, setIsMovingTowards] = useState(false);
   const [hasStartedMoving, setHasStartedMoving] = useState(false);
-
+  const [preAlertWarning, setPreAlertWarning] = useState(null);
   const speedMap = {
     walking: 5,
     bike: 15,
@@ -52,6 +53,11 @@ function App() {
 
   const [journeyStarted, setJourneyStarted] = useState(false);
   const [audio] = useState(new Audio("/alert.mp3"));
+
+
+  const [currentSpeed, setCurrentSpeed] = useState(0);
+  const lastPosition = useRef(null);
+  const lastTimestamp = useRef(null);
 
   // ✅ Detect device
   useEffect(() => {
@@ -76,7 +82,6 @@ function App() {
     audio.currentTime = 0;
   };
 
-  // 📍 GEOLOCATION TRACKING
   useEffect(() => {
     if (!navigator.geolocation) {
       setLocationError(true);
@@ -87,15 +92,40 @@ function App() {
       (position) => {
         const lat = position.coords.latitude;
         const lng = position.coords.longitude;
+        const timestamp = position.timestamp;
 
         setUserLat(lat);
         setUserLng(lng);
         setLocationError(false);
 
+        // 🔥 REAL GPS SPEED (m/s → km/h)
+        let speedKmh = position.coords.speed ? position.coords.speed * 3.6 : 0;
+
+        lastPosition.current = { lat, lng };
+        lastTimestamp.current = timestamp;
+
+        // 🔥 fallback manual speed calc
+        if (!position.coords.speed && lastPosition.current && lastTimestamp.current) {
+          const d = getDistance(lastPosition.lat, lastPosition.lng, lat, lng);
+          const timeDiff = (timestamp - lastTimestamp) / 3600000; // hours
+
+          if (timeDiff > 0) {
+            speedKmh = d / timeDiff;
+          }
+        }
+
+        // 🔥 smooth speed (prevents jumps)
+        setCurrentSpeed((prev) =>
+          prev === 0 ? speedKmh : prev * 0.7 + speedKmh * 0.3
+        );
+
+        setLastPosition({ lat, lng });
+        setLastTimestamp(timestamp);
+
         if (!destLat || !destLng) return;
 
         const d = getDistance(lat, lng, destLat, destLng);
-        handleDistanceLogic(d);
+        handleDistanceLogic(d, speedKmh);
       },
       () => setLocationError(true),
       { enableHighAccuracy: true }
@@ -104,23 +134,44 @@ function App() {
     return () => navigator.geolocation.clearWatch(watcher);
   }, [destLat, destLng, travelMode]);
 
-  // ✅ FIX: manual selection calculation
+  // manual trigger
   useEffect(() => {
     if (!userLat || !userLng || !destLat || !destLng) return;
 
     const d = getDistance(userLat, userLng, destLat, destLng);
-    handleDistanceLogic(d);
+    handleDistanceLogic(d, currentSpeed);
   }, [userLat, userLng, destLat, destLng]);
 
-  // 🔥 COMMON DISTANCE LOGIC
-  const handleDistanceLogic = (d) => {
+  // 🔥 DISTANCE LOGIC (FIXED + LIVE SPEED)
+  const handleDistanceLogic = (d, liveSpeed) => {
     setDistance(d.toFixed(2));
 
-    const speed = speedMap[travelMode] || 40;
-    const timeMin = (d / speed) * 60;
+    const fallbackSpeed = {
+      walking: 4,
+      bike: 20,
+      car: 30,
+      bus: 25,
+      train: 60,
+    };
 
-    setEta(timeMin.toFixed(1));
-    setRemainingTime(timeMin);
+    const speed =
+  liveSpeed && liveSpeed > 1
+    ? liveSpeed
+    : fallbackSpeed[travelMode];
+    const baseTime = (d / speed) * 60;
+
+    const bufferMap = {
+      walking: 1.3,
+      bike: 1.2,
+      car: 1.15,
+      bus: 1.25,
+      train: 1.1,
+    };
+
+    const adjustedTime = baseTime * (bufferMap[travelMode] || 1.2);
+
+    setEta(Math.round(adjustedTime));
+    setRemainingTime(adjustedTime);
 
     if (prevDistance !== null) {
       if (d < prevDistance) {
@@ -137,13 +188,13 @@ function App() {
 
     const allowAlert = testMode || (hasStartedMoving && isMovingTowards);
 
-    if (allowAlert && timeMin <= alertTime * 2 && alertStage === null) {
+    if (allowAlert && adjustedTime <= alertTime * 2 && alertStage === null) {
       setAlertStage("warning");
       setShowAlert(true);
       setAlertMessage("🟡 You are getting close to your destination");
     }
 
-    if (allowAlert && timeMin <= alertTime && !alertTriggered) {
+    if (allowAlert && adjustedTime <= alertTime && !alertTriggered) {
       setAlertStage("final");
       setShowAlert(true);
       setAlertMessage("🔴 Final alert: You are about to reach your destination");
@@ -155,6 +206,29 @@ function App() {
     }
   };
 
+  // START JOURNEY (PRE-CHECK)
+  const handleStartJourney = () => {
+    if (!userLat || !userLng || !destLat || !destLng) {
+      alert("Please select destination first");
+      return;
+    }
+
+    const d = getDistance(userLat, userLng, destLat, destLng);
+    const speed = currentSpeed > 1 ? currentSpeed : 30;
+    const timeToReach = (d / speed) * 60;
+
+    if (timeToReach <= alertTime) {
+      setPreAlertWarning({
+        distance: d.toFixed(2),
+        time: timeToReach.toFixed(1),
+      });
+      return;
+    }
+
+    setJourneyStarted(true);
+  };
+
+
   return loading ? (
     <SplashScreen onFinish={() => setLoading(false)} />
   ) : (
@@ -164,7 +238,7 @@ function App() {
         <h1 className="app-title">ARRIVO</h1>
 
         <p className="app-subtitle">
-          💤 Never miss your stop again. Smart wake-up alerts for travelers.
+          Never miss your stop again. Smart wake-up alerts for travelers.
         </p>
 
         {/* ✅ FIXED ERROR BOX */}
@@ -183,6 +257,7 @@ function App() {
             </button>
           </div>
         )}
+
 
         {/* MAP */}
         <div className="section map-section">
@@ -227,7 +302,7 @@ function App() {
           {!journeyStarted && (
             <>
               <div className="control-block">
-                <p className="control-title">Mode: {travelMode}</p>
+                <p className="control-title">Mode of Transport: {travelMode}</p>
                 <div className="toggle-group">
                   {["walking", "bike", "car", "bus", "train"].map((mode) => (
                     <button
@@ -246,7 +321,7 @@ function App() {
               </div>
 
               <div className="control-block">
-                <p className="control-title">Alert: {alertTime} mins</p>
+                <p className="control-title">Alert Before: {alertTime} mins</p>
                 <div className="toggle-group">
                   {[5, 10, 15].map((time) => (
                     <button
@@ -263,7 +338,7 @@ function App() {
               <div className="controls-row">
                 <JourneyControls
                   journeyStarted={journeyStarted}
-                  setJourneyStarted={setJourneyStarted}
+                  setJourneyStarted={handleStartJourney}
                   destLat={destLat}
                   destLng={destLng}
                   resetJourney={resetJourney}
@@ -309,9 +384,30 @@ function App() {
           )}
         </div>
         
+        {preAlertWarning && (
+          <div className="warning-box">
+            ⚠️ You’re already very close to your destination.<br />
+            You may reach in {preAlertWarning.time} mins.
+
+            <div className="warning-actions">
+              <button
+                onClick={() => {
+                  setPreAlertWarning(null);
+                  setJourneyStarted(true);
+                }}
+              >
+                Start Anyway
+              </button>
+
+              <button onClick={() => setPreAlertWarning(null)}>
+                Adjust Alert
+              </button>
+            </div>
+          </div>
+        )}
 
         <div className="section center">
-          <p><strong>Destination:</strong> {placeName || "Not selected"}</p>
+          <p><strong>DESTINATION:</strong> {placeName || "NOT SELECTED"}</p>
           {testMode && ( <> <div className="test-banner">🧪 Test Mode Active</div> <p>Source & destination are the same, so alerts trigger instantly.</p> </> )}
           {journeyStarted && (
             <div className="stats-container">
@@ -324,7 +420,10 @@ function App() {
                 <p>ETA</p>
                 <h2>{eta || "--"} min</h2>
               </div>
-
+              <div className="stat-card">
+                <p>Speed</p>
+                <h2>{currentSpeed ? currentSpeed.toFixed(1) : "--"} km/h</h2>
+              </div>
               <div className="stat-card">
                 <p>Remaining</p>
                 <h2>{remainingTime?.toFixed(1) || "--"} min</h2>

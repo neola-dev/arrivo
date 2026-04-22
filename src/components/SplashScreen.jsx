@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import LottieImport from "lottie-react";
-import splashAnim from "../animations/travel2.json";
+import splashAnim from "../animations/travel1.json";
 import "./splash.css";
 
 const Lottie = LottieImport.default; // ✅ FIX
@@ -18,26 +18,31 @@ function SplashScreen({ onFinish }) {
   }, [onFinish]);
 
   return (
-    <div className={`splash-container ${exit ? "exit" : ""}`}>
-      <div className="bg-glow"></div>
-
+  <div className={`splash-container ${exit ? "exit" : ""}`}>
+    <div className="bg-glow"></div>
+    <div className="content-wrapper">
       <div className="lottie-wrapper">
         <Lottie animationData={splashAnim} loop />
       </div>
-
       <div className="logo">ARRIVO</div>
 
-      <p className="tagline">Wake-Up Alerts for Travelers</p>
+      <p className="tagline">Your Personal Travel Companion</p>
 
       <div className="subtitle">
-        💤 Don’t miss your stop — we’ll wake you up on time
+        Sleep peacefully — we’ll wake you right on time.
       </div>
 
       <div className="subtitle small">
-        📍 Real-time tracking • Smart alerts • Travel stress-free
+        We track your journey in real-time so you never miss your stop.
       </div>
+
+      <div className="subtitle small">
+        Smart alerts • Live tracking • Stress-free travel
+      </div>
+
     </div>
-  );
+  </div>
+);
 }
 
 export default SplashScreen;

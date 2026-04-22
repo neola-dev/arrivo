@@ -6,19 +6,34 @@ body {
   height: 100vh;
 }
 
+.content-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-align: center;
+  z-index: 2;
+}
+
 /* MAIN CONTAINER */
 .splash-container {
   height: 100vh;
   width: 100vw;
   background: radial-gradient(circle at top, #1e3a8a, #020617);
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
   color: white;
   position: relative;
   overflow: hidden;
   animation: fadeIn 1s ease-in-out;
+}
+
+.lottie-wrapper {
+  width: 220px;
+  height: 220px;
+  z-index: 2;
 }
 
 /* 🔥 GLOW BACKGROUND (more premium) */
@@ -65,21 +80,25 @@ body {
   text-shadow: 
     0 0 25px rgba(59,130,246,0.9),
     0 0 50px rgba(59,130,246,0.4);
+  margin-top: 0px;
+  margin-bottom: 6px;  
+  align-self: center;
 }
 
 /* 🔥 TAGLINE (main message) */
 .tagline {
-  margin-top: 14px;
+  margin-top: 0px;
   font-size: 18px;
   font-weight: 500;
   opacity: 0.9;
   letter-spacing: 1px;
   animation: fadeUp 1.6s ease;
+  font-style: italic;
 }
 
 /* 🔥 SUBTITLE (USP) */
 .subtitle {
-  margin-top: 18px;
+  margin-top: 6px;
   font-size: 14px;
   opacity: 0.75;
   animation: fadeUp 2s ease;

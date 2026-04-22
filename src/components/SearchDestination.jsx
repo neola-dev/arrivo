@@ -25,14 +25,14 @@ function SearchDestination({ setDestLat, setDestLng, setPlaceName, setTestMode }
   };
 
   return (
-    <div style={{ marginTop: "20px",textAlign: "center" }}>
-      <h3>Search Destination:</h3>
+    <div style={{ marginTop: "20px",textAlign: "center"}}>
+      <h3>SEARCH DESTINATION:</h3>
 
       <Autocomplete onLoad={onLoad} onPlaceChanged={onPlaceChanged}>
         <input
           type="text"
           placeholder="Search place (village, city, shop...)"
-          style={{ width: "300px", padding: "8px" }}
+          style={{ width: "300px", padding: "8px"}}
         />
       </Autocomplete>
     </div>

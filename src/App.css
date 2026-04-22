@@ -13,6 +13,8 @@ html, body, #root {
   box-sizing: border-box;
 }
 
+
+
 /* ===== MAIN CONTAINER ===== */
 .app-container {
   padding: 24px;
@@ -41,10 +43,10 @@ html, body, #root {
 }
 
 /* ===== MAP ===== */
-.map-container {
+.map-section{
   border-radius: 18px;
   overflow: hidden;
-  border: 2px solid #334155;
+  border: 2px solid #38bdf8;
 }
 
 /* ===== CONTROL PANEL (MAIN UI FIX) ===== */
@@ -68,11 +70,40 @@ html, body, #root {
   margin-top: -10px;
   margin-bottom: 20px;
   font-size: 15px;
-  color: #94a3b8;
+  color: #cbd5f5;
   max-width: 600px;
   margin-left: auto;
   margin-right: auto;
   line-height: 1.6;
+}
+
+/* Initial state */
+.app-title,
+.app-subtitle {
+  opacity: 0;
+  transform: translateY(-40px);
+  animation: slideDownFade 0.8s ease-out forwards;
+}
+
+/* Add slight delay for subtitle (nice effect) */
+.app-subtitle {
+  animation-delay: 0.3s;
+}
+
+/* Animation keyframes */
+@keyframes slideDownFade {
+  0% {
+    opacity: 0;
+    transform: translateY(-40px);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(8px); /* small bounce feel */
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ===== GROUP TITLES ===== */
@@ -141,6 +172,9 @@ button.active {
   outline: none;
 }
 
+.section input{
+  border-radius: 10px;
+}
 /* ===== TEST BANNER ===== */
 .test-banner {
   margin-top: 12px;
@@ -315,6 +349,29 @@ button.active {
 
 .manual-src-btn:active {
   transform: scale(0.96);
+}
+
+
+.warning-box {
+  background: rgba(255, 193, 7, 0.1);
+  border: 1px solid #facc15;
+  color: #fde68a;
+  padding: 12px;
+  border-radius: 10px;
+  margin: 15px 0;
+  text-align: center;
+}
+
+.warning-actions {
+  margin-top: 10px;
+}
+
+.warning-actions button {
+  margin: 5px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
 }
 
 /* ✨ smooth entry animation */
