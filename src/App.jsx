@@ -127,7 +127,22 @@ function App() {
         const d = getDistance(lat, lng, destLat, destLng);
         handleDistanceLogic(d, speedKmh);
       },
-      () => setLocationError(true),
+      (error) => {
+          console.log("Geo error:", error);
+
+          if (error.code === 1) {
+            // PERMISSION DENIED
+            setLocationError("denied");
+          } else if (error.code === 2) {
+            // POSITION UNAVAILABLE
+            setLocationError("unavailable");
+          } else if (error.code === 3) {
+            // TIMEOUT
+            setLocationError("timeout");
+          } else {
+            setLocationError(true);
+         }
+      },
       { enableHighAccuracy: true }
     );
 
@@ -258,7 +273,34 @@ function App() {
           </div>
         )}
 
+        {locationError && (
+          <div className="error-box">
+            📍 Location access is required for tracking.
 
+            <br />
+
+            <button
+              className="manual-src-btn"
+              onClick={() => {
+                navigator.geolocation.getCurrentPosition(
+                  (pos) => {
+                    setUserLat(pos.coords.latitude);
+                    setUserLng(pos.coords.longitude);
+                    setLocationError(false);
+                  },
+                  () => alert("Please enable location in phone settings"),
+                  { enableHighAccuracy: true }
+                );
+              }}
+            >
+              Enable Location
+            </button>
+
+            <p style={{ fontSize: "12px", opacity: 0.7 }}>
+              If popup doesn’t appear, enable location in Settings → Permissions → Location
+            </p>
+          </div>
+        )}
         {/* MAP */}
         <div className="section map-section">
           <MapSelector
