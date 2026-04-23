@@ -190,13 +190,3 @@ Steps:
 ## 👨‍💻 Author
 
 **Neola**
-
-
-## ⭐ Support
-
-If you like this project, give it a ⭐ on GitHub!
-
-👉 I can give you a **perfect 2-minute explanation script for Arrivo (interview answer)**
-👉 Or mock questions interviewer will ask on this README
-
-Just tell me 👍
